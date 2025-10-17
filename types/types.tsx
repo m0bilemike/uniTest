@@ -1,5 +1,5 @@
 declare global {
-    namespace JSX {
-      type Element = React.JSX.Element;
-    }
+  namespace JSX {
+    type Element = React.JSX.Element;
   }
+}
