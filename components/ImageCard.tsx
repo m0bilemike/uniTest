@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   cardGrid: {
-    flex: 1,
+    flex: 0.48,
     margin: 5,
   },
   bottomSection: {

@@ -5,9 +5,7 @@ import {
   PayloadAction,
 } from "@reduxjs/toolkit";
 
-export const imagesAdapter = createEntityAdapter<PicsumImage>({
-  selectId: (img) => img.id,
-});
+export const imagesAdapter = createEntityAdapter<PicsumImage>();
 
 const initialState = imagesAdapter.getInitialState();
 
@@ -38,5 +36,4 @@ const imageSlice = createSlice({
 });
 
 export const { toggleLike, addImages } = imageSlice.actions;
-
 export default imageSlice.reducer;

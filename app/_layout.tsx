@@ -31,11 +31,11 @@ export default function RootLayout() {
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
     ...FontAwesome.font,
   });
-  
+
   useEffect(() => {
     if (error) throw error;
   }, [error]);
-  
+
   useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync();
@@ -57,7 +57,11 @@ export default function RootLayout() {
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen
               name="settings"
-              options={{ presentation: "modal", headerShown: false }}
+              options={{
+                presentation: "modal",
+                headerShown: false,
+                gestureEnabled: true,
+              }}
             />
           </Stack>
 

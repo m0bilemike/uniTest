@@ -7,16 +7,15 @@ import { HeaderTitle } from "@/components/HeaderTitle";
 import { ImageCard } from "@/components/ImageCard";
 import { Text, useThemeColor, View } from "@/components/Themed";
 import { usePicsumImages } from "@/hooks/usePicsumImages";
-import { AppDispatch, RootState } from "@/store";
+import { AppDispatch } from "@/store";
+import { selectLikedImages } from "@/store/imageSelectors";
 import { toggleLike } from "@/store/imageSlice";
 import { PicsumImage } from "@/types/types";
 
 export default function HomeScreen() {
   const [isGrid, setIsGrid] = React.useState(false);
   const dispatch = useDispatch<AppDispatch>();
-  const likedImages = useSelector((state: RootState) =>
-    state.images.ids.map((id) => state.images.entities[id]).filter(Boolean),
-  );
+  const likedImages = useSelector(selectLikedImages);
 
   const {
     data,
@@ -40,7 +39,7 @@ export default function HomeScreen() {
 
   const renderItem = useCallback(
     ({ item }: { item: PicsumImage }) => {
-      const liked = likedImages.some((img) => img.id === item.id);
+      const liked = likedImages.some((img: PicsumImage) => img.id === item.id);
 
       return (
         <ImageCard

@@ -7,20 +7,21 @@ import { HeaderTitle } from "@/components/HeaderTitle";
 import { ImageCard } from "@/components/ImageCard";
 import { Text, useThemeColor, View } from "@/components/Themed";
 import { AppDispatch, RootState } from "@/store";
+import { selectLikedImages } from "@/store/imageSelectors";
 import { toggleLike } from "@/store/imageSlice";
 import { PicsumImage } from "@/types/types";
 
 export default function LikedImages() {
   const dispatch = useDispatch<AppDispatch>();
-  const likedImages = useSelector((state: RootState) =>
-    state.images.ids.map((id) => state.images.entities[id]).filter(Boolean),
-  );
+  const likedImages = useSelector(selectLikedImages);
   const theme = useSelector((state: RootState) => state.theme.current);
   const [isGrid, setIsGrid] = useState(true);
 
   const validImages = useMemo(
     () =>
-      likedImages.filter((img) => img?.id && img?.download_url && img?.author),
+      likedImages.filter(
+        (img: PicsumImage) => img?.id && img?.download_url && img?.author,
+      ),
     [likedImages],
   );
   const textColor = useThemeColor({}, "text");
@@ -28,7 +29,7 @@ export default function LikedImages() {
 
   const renderItem = useCallback(
     ({ item }: { item: PicsumImage }) => {
-      const liked = likedImages.some((img) => img.id === item.id);
+      const liked = likedImages.some((img: PicsumImage) => img.id === item.id);
 
       return (
         <ImageCard
