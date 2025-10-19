@@ -26,18 +26,18 @@ export default function TabLayout() {
         <Tabs.Screen
           name="index"
           options={{
-            title: "Home",
+            title: "Images",
             tabBarIcon: ({ color }) => (
-              <FontAwesome6 name="house" size={28} color={color} />
+              <FontAwesome6 name="image" size={28} color={color} />
             ),
           }}
         />
         <Tabs.Screen
           name="likedImages"
           options={{
-            title: "Explore",
+            title: "Likes",
             tabBarIcon: ({ color }) => (
-              <FontAwesome6 name="star" size={28} color={color} />
+              <FontAwesome6 name="heart" size={28} color={color} />
             ),
           }}
         />
