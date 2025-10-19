@@ -3,13 +3,14 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useRef } from "react";
 import {
+    ActivityIndicator,
     Animated,
     StyleSheet,
-    Text,
     TouchableOpacity,
     View,
 } from "react-native";
 import { DoubleTapImage } from "./DoubleTapImage";
+import { Text, useThemeColor } from "./Themed";
 
 interface ImageCardProps {
   item: PicsumImage;
@@ -25,6 +26,8 @@ export const ImageCard: React.FC<ImageCardProps> = ({
   onToggleLike,
 }) => {
   const heartAnim = useRef(new Animated.Value(1)).current;
+  const [isLoading, setIsLoading] = React.useState(true);
+    const color = useThemeColor({}, "text");
 
   const triggerHeart = () => {
     onToggleLike();
@@ -33,17 +36,21 @@ export const ImageCard: React.FC<ImageCardProps> = ({
       Animated.spring(heartAnim, { toValue: 1, useNativeDriver: true }),
     ]).start();
   };
-
+const handleLoad = () => setIsLoading(false);
   return (
     <View style={[styles.card, isGrid && styles.cardGrid]}>
       <DoubleTapImage
         uri={item.download_url}
         liked={liked}
         isGrid={isGrid}
-        onDoubleTap={triggerHeart} // double tap triggers both redux and animation
+        onDoubleTap={triggerHeart}
+        onLoad={() => setIsLoading(false)}
       />
-
-      {/* Top-right heart */}
+{isLoading && (
+        <View style={styles.loaderContainer}>
+          <ActivityIndicator size="small" color={color} />
+        </View>
+      )}
       <TouchableOpacity
         style={styles.heartButton}
         onPress={triggerHeart}
@@ -58,7 +65,6 @@ export const ImageCard: React.FC<ImageCardProps> = ({
         </Animated.View>
       </TouchableOpacity>
 
-      {/* Bottom author overlay */}
       <LinearGradient
         colors={["transparent", "rgba(0,0,0,0.5)"]}
         style={[styles.bottomSection, isGrid && styles.bottomSectionGrid]}
@@ -74,23 +80,30 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     borderRadius: 8,
     overflow: "hidden",
-    backgroundColor: "#f8f8f8",
   },
-  cardGrid: { flex: 1, margin: 5 },
+  cardGrid: {
+    flex: 1,
+    margin: 5
+},
   bottomSection: {
     position: "absolute",
     bottom: 0,
-    left: 0,
-    right: 0,
-    padding: 6,
+    width: "100%",
+    paddingHorizontal: 6,
+    paddingVertical: 4,
+    backgroundColor: "rgba(0,0,0,0.5)",
     justifyContent: "flex-end",
-    borderBottomLeftRadius: 8,
-    borderBottomRightRadius: 8,
   },
   bottomSectionGrid: {
-    paddingVertical: 4,
+    position: "absolute",
+    bottom: 5,
+    left: 5,
+    right: 5,
+    width: "95%",
+    paddingLeft: 5,
     borderBottomLeftRadius: 4,
     borderBottomRightRadius: 4,
+    overflow: "hidden",
   },
   author: {
     color: "white",
@@ -103,4 +116,15 @@ heartButton: {
     right: 5,
     zIndex: 10
 },
+loaderContainer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.3)",
+    borderRadius: 8,
+  },
 });

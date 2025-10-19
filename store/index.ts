@@ -3,10 +3,12 @@ import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { persistReducer, persistStore } from "redux-persist";
 import appUsageReducer from "./appUsageSlice";
 import imageReducer from "./imageSlice";
+import themeReducer from "./themeSlice";
 
 const rootReducer = combineReducers({
   images: imageReducer,
   appUsage: appUsageReducer,
+  theme: themeReducer,
 });
 
 const persistConfig = {

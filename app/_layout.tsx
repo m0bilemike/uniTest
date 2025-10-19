@@ -1,12 +1,14 @@
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { AppDispatch, persistor, store } from "@/store";
 import { registerAppOpen } from "@/store/appUsageSlice";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 import {
   DarkTheme,
   DefaultTheme,
   ThemeProvider,
 } from "@react-navigation/native";
-import { Stack } from "expo-router";
+import { useFonts } from "expo-font";
+import { SplashScreen, Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { ActivityIndicator } from "react-native";
@@ -25,7 +27,15 @@ export const AppInitializer: React.FC = () => {
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
-
+  const [loaded, error] = useFonts({
+    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
+    ...FontAwesome.font,
+  });
+  useEffect(() => {
+    if (loaded) {
+      SplashScreen.hideAsync();
+    }
+  }, [loaded]);
   return (
     <Provider store={store}>
       <PersistGate
@@ -41,7 +51,7 @@ export default function RootLayout() {
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen
               name="settings"
-              options={{ presentation: "modal", title: "Settings" }}
+              options={{ presentation: "modal", headerShown: false }}
             />
           </Stack>
 
