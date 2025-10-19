@@ -12,10 +12,10 @@ type ThemeName = "light" | "dark";
 
 export function useThemeColor(
   props: { light?: string; dark?: string },
-  colorName: keyof typeof Colors.light & keyof typeof Colors.dark
+  colorName: keyof typeof Colors.light & keyof typeof Colors.dark,
 ) {
   const theme: ThemeName = useSelector(
-    (state: RootState) => state.theme.current
+    (state: RootState) => state.theme.current,
   );
 
   const colorFromProps = props[theme];
@@ -27,14 +27,19 @@ export function useThemeColor(
 export function Text(props: TextProps) {
   const { style, lightColor, darkColor, ...otherProps } = props;
   const color = useThemeColor({ light: lightColor, dark: darkColor }, "text");
-  return <DefaultText style={[{ color, fontFamily: 'SpaceMono' }, style]} {...otherProps} />;
+  return (
+    <DefaultText
+      style={[{ color, fontFamily: "SpaceMono" }, style]}
+      {...otherProps}
+    />
+  );
 }
 
 export function View(props: ViewProps) {
   const { style, lightColor, darkColor, ...otherProps } = props;
   const backgroundColor = useThemeColor(
     { light: lightColor, dark: darkColor },
-    "background"
+    "background",
   );
 
   return <DefaultView style={[{ backgroundColor }, style]} {...otherProps} />;

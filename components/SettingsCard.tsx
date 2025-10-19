@@ -9,7 +9,7 @@ interface SettingsCardProps {
   showSwitch?: boolean;
   switchValue?: boolean;
   onSwitchChange?: (val: boolean) => void;
-  index?: number; // for staggered animation
+  index?: number;
 }
 
 const SettingsCard: React.FC<SettingsCardProps> = ({
@@ -28,7 +28,6 @@ const SettingsCard: React.FC<SettingsCardProps> = ({
   const opacityAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    // staggered animation based on index
     Animated.parallel([
       Animated.timing(slideAnim, {
         toValue: 0,
@@ -49,12 +48,18 @@ const SettingsCard: React.FC<SettingsCardProps> = ({
     <Animated.View
       style={[
         styles.card,
-        { backgroundColor: cardBg, transform: [{ translateY: slideAnim }], opacity: opacityAnim },
+        {
+          backgroundColor: cardBg,
+          transform: [{ translateY: slideAnim }],
+          opacity: opacityAnim,
+        },
       ]}
     >
       <Text style={[styles.label, { color }]}>{label}</Text>
       <View style={styles.rightContainer}>
-        {value !== undefined && <Text style={[styles.value, { color }]}>{value}</Text>}
+        {value !== undefined && (
+          <Text style={[styles.value, { color }]}>{value}</Text>
+        )}
         {icon && <Text style={styles.icon}>{icon}</Text>}
         {showSwitch && (
           <Switch
@@ -84,8 +89,20 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 3,
   },
-  label: { fontSize: 16, fontWeight: "500" },
-  rightContainer: { flexDirection: "row", alignItems: "center", gap: 8 },
-  value: { fontSize: 16, fontWeight: "700" },
-  icon: { fontSize: 24 },
+  label: {
+    fontSize: 16,
+    fontWeight: "500",
+  },
+  rightContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  value: {
+    fontSize: 16,
+    fontWeight: "700",
+  },
+  icon: {
+    fontSize: 24,
+  },
 });

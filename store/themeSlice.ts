@@ -6,7 +6,7 @@ interface ThemeState {
   current: ThemeType;
 }
 
-const initialState: ThemeState = { current: "light" }; // ✅ correct
+const initialState: ThemeState = { current: "light" };
 
 const themeSlice = createSlice({
   name: "theme",

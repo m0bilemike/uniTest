@@ -31,11 +31,17 @@ export default function RootLayout() {
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
     ...FontAwesome.font,
   });
+  
+  useEffect(() => {
+    if (error) throw error;
+  }, [error]);
+  
   useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync();
     }
   }, [loaded]);
+
   return (
     <Provider store={store}>
       <PersistGate

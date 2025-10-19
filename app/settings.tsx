@@ -21,8 +21,8 @@ export default function SettingsScreen() {
   const handleToggle = () => dispatch(toggleTheme());
 
   const containerBg = useThemeColor({}, "background");
-  const handleColor = useThemeColor({}, "textSecondary"); // subtle color for handle
-  const titleColor = useThemeColor({}, "text"); // theme-aware text color
+  const handleColor = useThemeColor({}, "textSecondary");
+  const titleColor = useThemeColor({}, "text");
 
   return (
     <View style={[styles.container, { backgroundColor: containerBg }]}>
@@ -33,11 +33,11 @@ export default function SettingsScreen() {
       <SettingsCard label="Daily Streak" value={appUsage.streak} icon="🔥" />
 
       <SettingsCard
-  label="Dark Theme"
-  showSwitch
-  switchValue={currentTheme === "dark"}
-  onSwitchChange={() => dispatch(toggleTheme())}
-/>
+        label="Dark Theme"
+        showSwitch
+        switchValue={currentTheme === "dark"}
+        onSwitchChange={handleToggle}
+      />
     </View>
   );
 }

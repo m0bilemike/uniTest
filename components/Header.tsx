@@ -4,8 +4,8 @@ import { StyleSheet } from "react-native";
 import { useThemeColor, View } from "./Themed";
 
 export const Header = () => {
-    const color = useThemeColor({}, "text");
-  
+  const color = useThemeColor({}, "text");
+
   return (
     <View style={styles.container}>
       <Link href="/settings">
@@ -23,5 +23,5 @@ const styles = StyleSheet.create({
     paddingRight: 15,
     paddingBottom: 20,
     alignItems: "flex-end",
-  }
-})
+  },
+});

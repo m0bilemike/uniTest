@@ -1,7 +1,7 @@
 declare module "redux-persist/integration/react" {
   import * as React from "react";
-    import { ReactNode } from "react";
-    import { Persistor } from "redux-persist";
+  import { ReactNode } from "react";
+  import { Persistor } from "redux-persist";
 
   interface PersistGateProps {
     loading?: ReactNode;

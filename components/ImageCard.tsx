@@ -3,11 +3,11 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useRef } from "react";
 import {
-    ActivityIndicator,
-    Animated,
-    StyleSheet,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Animated,
+  StyleSheet,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { DoubleTapImage } from "./DoubleTapImage";
 import { Text, useThemeColor } from "./Themed";
@@ -27,7 +27,7 @@ export const ImageCard: React.FC<ImageCardProps> = ({
 }) => {
   const heartAnim = useRef(new Animated.Value(1)).current;
   const [isLoading, setIsLoading] = React.useState(true);
-    const color = useThemeColor({}, "text");
+  const color = useThemeColor({}, "text");
 
   const triggerHeart = () => {
     onToggleLike();
@@ -36,7 +36,7 @@ export const ImageCard: React.FC<ImageCardProps> = ({
       Animated.spring(heartAnim, { toValue: 1, useNativeDriver: true }),
     ]).start();
   };
-const handleLoad = () => setIsLoading(false);
+
   return (
     <View style={[styles.card, isGrid && styles.cardGrid]}>
       <DoubleTapImage
@@ -46,7 +46,7 @@ const handleLoad = () => setIsLoading(false);
         onDoubleTap={triggerHeart}
         onLoad={() => setIsLoading(false)}
       />
-{isLoading && (
+      {isLoading && (
         <View style={styles.loaderContainer}>
           <ActivityIndicator size="small" color={color} />
         </View>
@@ -83,8 +83,8 @@ const styles = StyleSheet.create({
   },
   cardGrid: {
     flex: 1,
-    margin: 5
-},
+    margin: 5,
+  },
   bottomSection: {
     position: "absolute",
     bottom: 0,
@@ -108,15 +108,15 @@ const styles = StyleSheet.create({
   author: {
     color: "white",
     fontWeight: "bold",
-    fontSize: 12
-},
-heartButton: {
+    fontSize: 12,
+  },
+  heartButton: {
     position: "absolute",
     top: 5,
     right: 5,
-    zIndex: 10
-},
-loaderContainer: {
+    zIndex: 10,
+  },
+  loaderContainer: {
     position: "absolute",
     top: 0,
     left: 0,

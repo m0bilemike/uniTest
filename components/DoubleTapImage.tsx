@@ -5,7 +5,7 @@ import {
   ActivityIndicator,
   Animated,
   StyleSheet,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback,
 } from "react-native";
 import { Text, View, useThemeColor } from "./Themed";
 
@@ -24,7 +24,7 @@ export const DoubleTapImage: React.FC<DoubleTapImageProps> = ({
   isGrid,
   onDoubleTap,
   author,
-  onLoad
+  onLoad,
 }) => {
   const [lastTap, setLastTap] = useState<number | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -38,14 +38,17 @@ export const DoubleTapImage: React.FC<DoubleTapImageProps> = ({
 
   useEffect(() => {
     if (!prevLiked.current && liked) {
-      // Only animate if liked changed from false → true
       Animated.sequence([
-        Animated.spring(scaleAnim, { toValue: 1, useNativeDriver: true, friction: 4 }),
+        Animated.spring(scaleAnim, {
+          toValue: 1,
+          useNativeDriver: true,
+          friction: 4,
+        }),
         Animated.spring(scaleAnim, { toValue: 0, useNativeDriver: true }),
       ]).start();
     }
     prevLiked.current = liked;
-  }, [liked]);
+  }, [liked, scaleAnim]);
 
   const handleLoad = () => {
     setIsLoaded(true);
@@ -67,27 +70,37 @@ export const DoubleTapImage: React.FC<DoubleTapImageProps> = ({
   return (
     <TouchableWithoutFeedback onPress={handleTap}>
       <View style={[styles.container, isGrid && styles.gridContainer]}>
-        {/* Image fade-in */}
         <Animated.Image
           source={{ uri }}
           onLoad={handleLoad}
-          style={[styles.image, isGrid && styles.gridImage, { opacity: fadeAnim }]}
+          style={[
+            styles.image,
+            isGrid && styles.gridImage,
+            { opacity: fadeAnim },
+          ]}
           resizeMode="cover"
         />
 
-        {/* Spinner while loading */}
         {!isLoaded && (
-          <View style={[styles.loaderContainer, { backgroundColor: placeholderColor }]}>
+          <View
+            style={[
+              styles.loaderContainer,
+              { backgroundColor: placeholderColor },
+            ]}
+          >
             <ActivityIndicator size="small" color="#fff" />
           </View>
         )}
 
-        {/* Heart overlay */}
-        <Animated.View style={[styles.heartOverlay, { transform: [{ scale: scaleAnim }], opacity: scaleAnim }]}>
+        <Animated.View
+          style={[
+            styles.heartOverlay,
+            { transform: [{ scale: scaleAnim }], opacity: scaleAnim },
+          ]}
+        >
           <MaterialIcons name="favorite" size={64} color="red" />
         </Animated.View>
 
-        {/* Author overlay */}
         {author && (
           <LinearGradient
             colors={["transparent", "rgba(0,0,0,0.7)"]}
@@ -102,10 +115,21 @@ export const DoubleTapImage: React.FC<DoubleTapImageProps> = ({
 };
 
 const styles = StyleSheet.create({
-  container: { position: "relative" },
-  gridContainer: { flex: 1, margin: 5 },
-  image: { width: "100%", height: 250, borderRadius: 8 },
-  gridImage: { height: 150 },
+  container: {
+    position: "relative",
+  },
+  gridContainer: {
+    flex: 1,
+    margin: 5,
+  },
+  image: {
+    width: "100%",
+    height: 250,
+    borderRadius: 8,
+  },
+  gridImage: {
+    height: 150,
+  },
   loaderContainer: {
     position: "absolute",
     top: 0,
