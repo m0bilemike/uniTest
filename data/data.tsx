@@ -1,14 +1,12 @@
 import { PicsumImage } from "@/types/types";
-import { QueryFunctionContext } from "@tanstack/react-query";
 
 export const QUERY_KEY = ["images"] as const;
-export const fetchImages = async (
-  context: QueryFunctionContext<typeof QUERY_KEY, number>,
-): Promise<PicsumImage[]> => {
-  const pageParam = context.pageParam ?? 1;
+
+export async function fetchImages(page: number): Promise<PicsumImage[]> {
   const res = await fetch(
-    `https://picsum.photos/v2/list?page=${pageParam}&limit=10`,
+    `https://picsum.photos/v2/list?page=${page}&limit=20`,
   );
-  if (!res.ok) throw new Error("Network response was not ok");
-  return res.json();
-};
+  if (!res.ok) throw new Error("Failed to fetch images");
+  const data: PicsumImage[] = await res.json();
+  return data;
+}

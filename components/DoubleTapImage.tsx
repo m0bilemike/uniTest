@@ -2,7 +2,6 @@ import { MaterialIcons } from "@expo/vector-icons";
 import React, { useEffect, useRef, useState } from "react";
 import {
   Animated,
-  Dimensions,
   Image,
   StyleSheet,
   TouchableWithoutFeedback,
@@ -11,107 +10,95 @@ import {
 
 interface DoubleTapImageProps {
   uri: string;
-  liked?: boolean;
+  liked: boolean;
+  isGrid?: boolean;
   onDoubleTap: () => void;
-  isGrid?: boolean; // Pass layout info
 }
 
-export function DoubleTapImage({
+export const DoubleTapImage: React.FC<DoubleTapImageProps> = ({
   uri,
-  liked = false,
+  liked,
+  isGrid,
   onDoubleTap,
-  isGrid = false,
-}: DoubleTapImageProps) {
-  const [isLiked, setIsLiked] = useState(liked);
-  const [showHeart, setShowHeart] = useState(false);
+}) => {
+  const [lastTap, setLastTap] = useState<number | null>(null);
   const scaleAnim = useRef(new Animated.Value(0)).current;
-  const lastTapRef = useRef<number | null>(null);
+  const prevLiked = useRef(liked);
 
-  const overlayOpacity = useRef(new Animated.Value(0)).current;
-
+  // Animate only when liked changes from false → true
   useEffect(() => {
-    Animated.timing(overlayOpacity, {
-      toValue: 1,
-      duration: 300,
-      useNativeDriver: true,
-    }).start();
-  }, []);
+    const animate = () => {
+      Animated.sequence([
+        Animated.spring(scaleAnim, {
+          toValue: 1,
+          useNativeDriver: true,
+          friction: 4,
+        }),
+        Animated.spring(scaleAnim, { toValue: 0, useNativeDriver: true }),
+      ]).start();
+    };
+
+    if (!prevLiked.current && liked) {
+      animate();
+    }
+
+    prevLiked.current = liked;
+  }, [liked, scaleAnim]); // include scaleAnim to satisfy lint
 
   const handleTap = () => {
     const now = Date.now();
-    if (lastTapRef.current && now - lastTapRef.current < 300) {
-      const willLike = !isLiked;
-      setIsLiked(willLike);
+    if (lastTap && now - lastTap < 300) {
       onDoubleTap();
-
-      if (willLike) {
-        setShowHeart(true);
-        Animated.spring(scaleAnim, {
-          toValue: 1,
-          friction: 4,
-          useNativeDriver: true,
-        }).start(() => {
-          setShowHeart(false);
-          scaleAnim.setValue(0);
-        });
-      } else {
-        Animated.timing(scaleAnim, {
-          toValue: 0.5,
-          duration: 150,
-          useNativeDriver: true,
-        }).start(() => scaleAnim.setValue(0));
-      }
     }
-    lastTapRef.current = now;
+    setLastTap(now);
   };
-
-  // Dynamic heart size
-  const heartSize = isGrid ? 40 : 60;
-  const imageWidth = isGrid
-    ? (Dimensions.get("window").width - 30) / 2
-    : Dimensions.get("window").width - 20;
 
   return (
     <TouchableWithoutFeedback onPress={handleTap}>
-      <View style={{ position: "relative", width: imageWidth }}>
+      <View style={[styles.container, isGrid && styles.gridContainer]}>
         <Image
           source={{ uri }}
-          style={[styles.image, { width: imageWidth }]}
-          resizeMode="cover"
+          style={[styles.image, isGrid && styles.gridImage]}
         />
-
-        {showHeart && (
-          <Animated.View
-            style={[
-              styles.heartContainer,
-              {
-                transform: [{ scale: scaleAnim }],
-                width: heartSize,
-                height: heartSize,
-                left: (imageWidth - heartSize) / 2,
-                top: 100 - heartSize / 2, // vertically center in image (assuming 200px height)
-              },
-            ]}
-          >
-            <MaterialIcons name="favorite" size={heartSize} color="white" />
-          </Animated.View>
-        )}
 
         <Animated.View
-          style={{ ...StyleSheet.absoluteFillObject, opacity: overlayOpacity }}
-        />
+          style={[
+            styles.heartOverlay,
+            {
+              transform: [{ scale: scaleAnim }],
+              opacity: scaleAnim,
+            },
+          ]}
+        >
+          <MaterialIcons name="favorite" size={64} color="red" />
+        </Animated.View>
       </View>
     </TouchableWithoutFeedback>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  image: {
-    height: 200,
-    borderRadius: 8,
+  container: {
+    position: "relative"
   },
-  heartContainer: {
+  gridContainer: {
+    flex: 1,
+    margin: 5
+  },
+  image: {
+    width: "100%",
+    height: 250,
+    borderRadius: 8
+  },
+  gridImage: {
+    height: 150
+  },
+  heartOverlay: {
     position: "absolute",
-    zIndex: 10,
+    top: "50%",
+    left: "50%",
+    zIndex: 2,
+    marginLeft: -32,
+    marginTop: -32,
   },
 });

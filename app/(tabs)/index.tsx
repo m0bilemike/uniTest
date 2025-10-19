@@ -1,17 +1,9 @@
-import { DoubleTapImage } from "@/components/DoubleTapImage"; // our animated component
-import { Header } from "@/components/Hearder";
-import { fetchImages, QUERY_KEY } from "@/data/data";
-import { AppDispatch, RootState } from "@/store";
-import { toggleLike } from "@/store/likesSlice";
-import { PicsumImage } from "@/types/types";
 import { MaterialIcons } from "@expo/vector-icons";
-import { InfiniteData, useInfiniteQuery } from "@tanstack/react-query";
-import { Image as ExpoImage } from "expo-image";
-import React, { useCallback, useEffect, useState } from "react";
+import { LinearGradient } from "expo-linear-gradient";
+import React, { useCallback, useEffect } from "react";
 import {
-  ActivityIndicator,
-  Dimensions,
   FlatList,
+  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -19,94 +11,81 @@ import {
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 
-const screenWidth = Dimensions.get("window").width;
+import { DoubleTapImage } from "@/components/DoubleTapImage";
+import { Header } from "@/components/Hearder";
+import { usePicsumImages } from "@/hooks/usePicsumImages";
+import { AppDispatch } from "@/store";
+import { selectLikedImages } from "@/store/imageSelectors";
+import { toggleLike } from "@/store/imageSlice";
+import { PicsumImage } from "@/types/types";
 
 export default function HomeScreen() {
-  const [isGrid, setIsGrid] = useState(false);
+  const [isGrid, setIsGrid] = React.useState(false);
   const dispatch = useDispatch<AppDispatch>();
-  const likedImages = useSelector(
-    (state: RootState) => state.likes.likedImages,
-  );
-
+  const likedImages = useSelector(selectLikedImages);
   const {
     data,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
+    isLoading,
     isError,
-    isPending,
-    isSuccess,
     error,
     refetch,
-    isRefetching,
-  } = useInfiniteQuery<
-    PicsumImage[],
-    Error,
-    InfiniteData<PicsumImage[]>,
-    typeof QUERY_KEY,
-    number
-  >({
-    queryKey: QUERY_KEY,
-    queryFn: fetchImages,
-    initialPageParam: 1,
-    getNextPageParam: (lastPage, allPages) =>
-      lastPage.length === 0 ? undefined : allPages.length + 1,
-  });
+  } = usePicsumImages();
 
-  const images = data?.pages.flat() ?? [];
-
+  const photos: PicsumImage[] = React.useMemo(
+    () => data?.pages.flat() ?? [],
+    [data]
+  );
   useEffect(() => {
-    if (!data) return;
-    const nextPageData = data.pages[data.pages.length - 1];
-    if (nextPageData)
-      nextPageData.forEach((img) => ExpoImage.prefetch(img.download_url));
-  }, [data]);
+    photos.forEach((img) => Image.prefetch?.(img.download_url));
+  }, [photos]);
 
   const toggleLayout = useCallback(() => setIsGrid((prev) => !prev), []);
-  const handleRefresh = useCallback(() => refetch(), [refetch]);
 
-  const renderItem = ({ item }: { item: (typeof images)[0] }) => {
-    const liked = likedImages.some((img) => img.id === item.id);
+  const renderItem = useCallback(
+    ({ item }: { item: PicsumImage }) => {
+      const liked = likedImages.some((img) => img.id === item.id);
 
-    return (
-      <View style={[styles.card, isGrid && styles.cardGrid]}>
-        <DoubleTapImage
-          uri={item.download_url}
-          liked={liked}
-          onDoubleTap={() => dispatch(toggleLike(item))}
-          isGrid={isGrid}
-        />
-
-        {/* Top-right heart button */}
-        <TouchableOpacity
-          style={styles.heartButton}
-          onPress={() => dispatch(toggleLike(item))}
-        >
-          <MaterialIcons
-            name={liked ? "favorite" : "favorite-border"}
-            size={24}
-            color={liked ? "red" : "white"}
-            style={styles.iconShadow}
+      return (
+        <View style={[styles.imageWrapper, isGrid && styles.imageWrapperGrid]}>
+          <DoubleTapImage
+            uri={item.download_url}
+            liked={liked}
+            isGrid={isGrid}
+            onDoubleTap={() => dispatch(toggleLike(item))}
           />
-        </TouchableOpacity>
+          <LinearGradient
+            colors={["transparent", "rgba(0,0,0,0.5)"]}
+            style={[styles.bottomSection, isGrid && styles.bottomSectionGrid]}
+          >
+            <Text style={styles.author}>{item.author}</Text>
+          </LinearGradient>
 
-        {/* Bottom author overlay */}
-        <View
-          style={[styles.bottomSection, isGrid && styles.bottomSectionGrid]}
-        >
-          <Text style={styles.author}>{item.author}</Text>
+          <TouchableOpacity
+            style={styles.heartButton}
+            onPress={() => dispatch(toggleLike(item))}
+            hitSlop={10}
+          >
+            <MaterialIcons
+              name={liked ? "favorite" : "favorite-border"}
+              size={24}
+              color={liked ? "red" : "white"}
+            />
+          </TouchableOpacity>
         </View>
-      </View>
-    );
-  };
+      );
+    },
+    [likedImages, isGrid, dispatch],
+  );
 
-  if (isPending) return <Loader />;
-  if (isError) return <Error message={error?.message} />;
-  if (!isSuccess) return null;
+  if (isLoading) return <Text style={styles.center}>Loading...</Text>;
+  if (isError)
+    return <Text style={styles.center}>Error: {error?.message}</Text>;
 
   return (
     <View style={{ flex: 1 }}>
-      {/* Header with toggle */}
       <Header />
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Images</Text>
@@ -120,39 +99,30 @@ export default function HomeScreen() {
       </View>
 
       <FlatList
-        data={images}
-        keyExtractor={(item) => item.id}
+        data={photos}
         renderItem={renderItem}
+        keyExtractor={(item) => item.id.toString()}
         key={isGrid ? "g" : "l"}
         numColumns={isGrid ? 2 : 1}
         contentContainerStyle={styles.list}
         columnWrapperStyle={isGrid ? styles.columnWrapper : undefined}
-        onEndReached={() =>
-          hasNextPage && !isFetchingNextPage && fetchNextPage()
-        }
-        onEndReachedThreshold={2}
-        refreshing={isRefetching}
-        onRefresh={handleRefresh}
+        onEndReached={() => {
+          if (hasNextPage && !isFetchingNextPage) fetchNextPage();
+        }}
+        onEndReachedThreshold={0.5}
+        refreshing={false}
+        onRefresh={refetch}
         ListFooterComponent={
           isFetchingNextPage ? (
-            <ActivityIndicator style={{ marginVertical: 20 }} />
+            <Text style={{ textAlign: "center", margin: 10 }}>
+              Loading more...
+            </Text>
           ) : null
         }
       />
     </View>
   );
 }
-
-const Loader = () => (
-  <View style={styles.center}>
-    <ActivityIndicator size="large" />
-  </View>
-);
-const Error = ({ message }: { message?: string }) => (
-  <View style={styles.center}>
-    <Text style={{ color: "red" }}>{message ?? "Error"}</Text>
-  </View>
-);
 
 const styles = StyleSheet.create({
   header: {
@@ -165,13 +135,55 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: "bold"
+    fontWeight: "bold",
   },
   list: {
-    padding: 10
+    padding: 10,
+  },
+  imageWrapper: {
+    position: "relative",
+    borderRadius: 8,
+    overflow: "hidden",
+    marginBottom: 10,
+    width: "100%",
+  },
+
+  imageWrapperGrid: {
+    flexBasis: "48%",
+  },
+
+  bottomSection: {
+    position: "absolute",
+    bottom: 0,
+    width: "95%",
+    paddingHorizontal: 6,
+    paddingVertical: 4,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "flex-end",
+  },
+  author: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 12,
+  },
+  heartButton: {
+    position: "absolute",
+    top: 8,
+    right: 8,
+    zIndex: 10,
+  },
+  bottomSectionGrid: {
+    position: "absolute",
+    bottom: 5,
+    left: 5,
+    right: 5,
+    width: "95%",
+    borderBottomLeftRadius: 4,
+    borderBottomRightRadius: 4,
+    overflow: "hidden",
   },
   columnWrapper: {
-    justifyContent: "space-between"
+    justifyContent: "space-between",
   },
   card: {
     marginBottom: 15,
@@ -181,32 +193,7 @@ const styles = StyleSheet.create({
   },
   cardGrid: {
     flex: 1,
-    margin: 5
-  },
-  bottomSection: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: "rgba(0,0,0,0.3)",
-    padding: 6,
-    justifyContent: "center",
-    borderBottomLeftRadius: 8,
-    borderBottomRightRadius: 8,
-  },
-  bottomSectionGrid: {
-    paddingVertical: 4,
-  },
-  author: {
-    color: "white",
-    fontWeight: "bold",
-    fontSize: 12
-  },
-  heartButton: {
-    position: "absolute",
-    top: 5,
-    right: 5,
-    zIndex: 2
+    margin: 5,
   },
   iconShadow: {
     textShadowColor: "white",
@@ -216,6 +203,6 @@ const styles = StyleSheet.create({
   center: {
     flex: 1,
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "center",
   },
 });

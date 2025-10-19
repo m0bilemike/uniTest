@@ -1,8 +1,11 @@
 import { DoubleTapImage } from "@/components/DoubleTapImage";
-import { AppDispatch, RootState } from "@/store";
-import { toggleLike } from "@/store/likesSlice";
+import { Header } from "@/components/Hearder";
+import { AppDispatch } from "@/store";
+import { selectLikedImages } from "@/store/imageSelectors";
+import { toggleLike } from "@/store/imageSlice"; // matches HomeScreen
 import { PicsumImage } from "@/types/types";
 import { MaterialIcons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import React, { useMemo, useState } from "react";
 import {
   FlatList,
@@ -15,9 +18,8 @@ import { useDispatch, useSelector } from "react-redux";
 
 export default function LikedImages() {
   const dispatch = useDispatch<AppDispatch>();
-  const likedImages = useSelector(
-    (state: RootState) => state.likes.likedImages,
-  );
+  const likedImages = useSelector(selectLikedImages);
+
   const [isGrid, setIsGrid] = useState(true);
 
   const validImages = useMemo(
@@ -32,48 +34,48 @@ export default function LikedImages() {
     const liked = likedImages.some((img) => img.id === item.id);
 
     return (
-      <View style={[styles.card, isGrid && styles.cardGrid]}>
-        {/* wrapper relative */}
-        <View style={{ position: "relative" }}>
-          <DoubleTapImage
-            uri={item.download_url}
-            liked={liked}
-            onDoubleTap={() => dispatch(toggleLike(item))}
-            isGrid={isGrid}
+      <View style={[styles.imageWrapper, isGrid && styles.imageWrapperGrid]}>
+        <DoubleTapImage
+          uri={item.download_url}
+          liked={liked}
+          isGrid={isGrid}
+          onDoubleTap={() => dispatch(toggleLike(item))}
+        />
+        <LinearGradient
+          colors={["transparent", "rgba(0,0,0,0.5)"]}
+          style={[styles.bottomSection, isGrid && styles.bottomSectionGrid]}
+        >
+          <Text style={styles.author}>{item.author}</Text>
+        </LinearGradient>
+        <TouchableOpacity
+          style={styles.heartButton}
+          onPress={() => dispatch(toggleLike(item))}
+        >
+          <MaterialIcons
+            name={liked ? "favorite" : "favorite-border"}
+            size={24}
+            color={liked ? "red" : "white"}
+            style={styles.iconShadow}
           />
-
-          {/* Top-right heart */}
-          <TouchableOpacity
-            style={styles.heartButton}
-            onPress={() => dispatch(toggleLike(item))}
-          >
-            <MaterialIcons
-              name={liked ? "favorite" : "favorite-border"}
-              size={24}
-              color={liked ? "red" : "white"}
-              style={styles.iconShadow}
-            />
-          </TouchableOpacity>
-
-          {/* Bottom author overlay, full width */}
-          <View style={styles.bottomSection}>
-            <Text style={styles.author}>{item.author}</Text>
-          </View>
-        </View>
+        </TouchableOpacity>
       </View>
     );
   };
 
   if (validImages.length === 0) {
     return (
+      <>
+      <Header />
       <View style={styles.center}>
         <Text>No liked images yet!</Text>
       </View>
+      </>
     );
   }
 
   return (
-    <View style={{ flex: 1, paddingTop: 100 }}>
+    <View style={{ flex: 1 }}>
+      <Header />
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Liked Images</Text>
         <TouchableOpacity onPress={toggleLayout}>
@@ -87,7 +89,7 @@ export default function LikedImages() {
 
       <FlatList
         data={validImages}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.id.toString()}
         renderItem={renderItem}
         numColumns={isGrid ? 2 : 1}
         key={isGrid ? "g" : "l"}
@@ -109,41 +111,61 @@ const styles = StyleSheet.create({
     borderBottomColor: "#ccc",
   },
   headerTitle: { fontSize: 18, fontWeight: "bold" },
+
   list: { padding: 10 },
   columnWrapper: { justifyContent: "space-between" },
 
-  card: {
-    marginBottom: 15,
+  imageWrapper: {
+    position: "relative",
     borderRadius: 8,
     overflow: "hidden",
-    backgroundColor: "#f8f8f8",
+    marginBottom: 10,
+    width: "100%",
   },
-
-  cardGrid: {
-    flexBasis: "48%", // fixed width for grid, leaves some gap
-    marginBottom: 15,
-    borderRadius: 8,
-    overflow: "hidden",
-  },
-
-  heartButton: { position: "absolute", top: 5, right: 5, zIndex: 2 },
-  iconShadow: {
-    textShadowColor: "white",
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 2,
+  imageWrapperGrid: {
+    flexBasis: "48%",
+    marginBottom: 10,
   },
 
   bottomSection: {
     position: "absolute",
     bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: "rgba(0,0,0,0.3)",
+    width: "95%",
     paddingHorizontal: 6,
-    paddingVertical: 2,
-    justifyContent: "center",
+    paddingVertical: 4,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "flex-end",
+  },
+  bottomSectionGrid: {
+    position: "absolute",
+    bottom: 5,
+    left: 5,
+    right: 5,
+    width: "95%",
+    borderBottomLeftRadius: 4,
+    borderBottomRightRadius: 4,
+    overflow: "hidden",
   },
 
-  author: { color: "white", fontWeight: "bold", fontSize: 12 },
-  center: { flex: 1, justifyContent: "center", alignItems: "center" },
+  author: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 12
+  },
+  heartButton: {
+    position: "absolute",
+    top: 8,
+    right: 8,
+    zIndex: 10
+  },
+  iconShadow: {
+    textShadowColor: "white",
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 2,
+  },
+  center: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center"
+  },
 });
