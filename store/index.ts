@@ -1,35 +1,26 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { configureStore } from "@reduxjs/toolkit";
-import {
-  FLUSH,
-  PAUSE,
-  PERSIST,
-  persistReducer,
-  persistStore,
-  PURGE,
-  REGISTER,
-  REHYDRATE,
-} from "redux-persist";
-import likesReducer from "./likesSlice";
+import { combineReducers, configureStore } from "@reduxjs/toolkit";
+import { persistReducer, persistStore } from "redux-persist";
+import appUsageReducer from "./appUsageSlice";
+import imageReducer from "./imageSlice";
+
+const rootReducer = combineReducers({
+  images: imageReducer,
+  appUsage: appUsageReducer,
+});
 
 const persistConfig = {
   key: "root",
   storage: AsyncStorage,
+  whitelist: ["images", "appUsage"],
 };
 
-const persistedReducer = persistReducer(persistConfig, likesReducer);
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 export const store = configureStore({
-  reducer: {
-    likes: persistedReducer,
-  },
+  reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({
-      serializableCheck: {
-        // Ignore redux-persist actions
-        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
-      },
-    }),
+    getDefaultMiddleware({ serializableCheck: false }),
 });
 
 export const persistor = persistStore(store);

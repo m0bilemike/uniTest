@@ -1,39 +1,42 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { PicsumImage } from "@/types/types";
+import {
+  createEntityAdapter,
+  createSlice,
+  PayloadAction,
+} from "@reduxjs/toolkit";
 
-interface PicsumImage {
-  id: string;
-  author: string;
-  download_url: string;
-  width: number;
-  height: number;
-  url: string;
-}
+export const imagesAdapter = createEntityAdapter<PicsumImage>({
+  selectId: (img) => img.id,
+});
 
-interface LikesState {
-  likedImages: PicsumImage[];
-}
+const initialState = imagesAdapter.getInitialState();
 
-const initialState: LikesState = {
-  likedImages: [],
-};
-
-const likesSlice = createSlice({
-  name: "likes",
+const imageSlice = createSlice({
+  name: "images",
   initialState,
   reducers: {
     toggleLike: (state, action: PayloadAction<PicsumImage>) => {
       const image = action.payload;
-      const exists = state.likedImages.find((img) => img.id === image.id);
-      if (exists) {
-        state.likedImages = state.likedImages.filter(
-          (img) => img.id !== image.id,
-        );
+      const id = image?.id;
+      if (!id) return;
+
+      if (!state.entities[id]) {
+        state.entities[id] = { ...image, liked: true };
+        state.ids.push(id);
       } else {
-        state.likedImages.push(image);
+        state.entities[id].liked = !state.entities[id].liked;
+        if (!state.entities[id].liked) {
+          state.ids = state.ids.filter((i) => i !== id);
+          delete state.entities[id];
+        }
       }
+    },
+    addImages: (state, action: PayloadAction<PicsumImage[]>) => {
+      imagesAdapter.addMany(state, action.payload);
     },
   },
 });
 
-export const { toggleLike } = likesSlice.actions;
-export default likesSlice.reducer;
+export const { toggleLike, addImages } = imageSlice.actions;
+
+export default imageSlice.reducer;
