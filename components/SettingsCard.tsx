@@ -63,6 +63,7 @@ const SettingsCard: React.FC<SettingsCardProps> = ({
         {icon && <Text style={styles.icon}>{icon}</Text>}
         {showSwitch && (
           <Switch
+            testID="switch"
             value={switchValue}
             onValueChange={onSwitchChange}
             trackColor={{ false: "#ccc", true: "#4cd137" }}

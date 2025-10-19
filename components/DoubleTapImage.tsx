@@ -68,9 +68,10 @@ export const DoubleTapImage: React.FC<DoubleTapImageProps> = ({
   };
 
   return (
-    <TouchableWithoutFeedback onPress={handleTap}>
+    <TouchableWithoutFeedback onPress={handleTap} testID="double-tap-touchable">
       <View style={[styles.container, isGrid && styles.gridContainer]}>
         <Animated.Image
+          testID="double-tap-image"
           source={{ uri }}
           onLoad={handleLoad}
           style={[

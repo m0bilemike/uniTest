@@ -48,13 +48,14 @@ export const ImageCard: React.FC<ImageCardProps> = ({
       />
       {isLoading && (
         <View style={styles.loaderContainer}>
-          <ActivityIndicator size="small" color={color} />
+          <ActivityIndicator size="small" color={color} testID="ActivityIndicator"/>
         </View>
       )}
       <TouchableOpacity
         style={styles.heartButton}
         onPress={triggerHeart}
         hitSlop={10}
+        accessibilityRole="button"
       >
         <Animated.View style={{ transform: [{ scale: heartAnim }] }}>
           <MaterialIcons

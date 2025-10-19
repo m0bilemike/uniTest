@@ -23,6 +23,7 @@ export const HeartButton: React.FC<HeartButtonProps> = ({ liked, onPress }) => {
       style={styles.heartButton}
       onPress={handlePress}
       hitSlop={10}
+      testID="heart-button"
     >
       <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
         <MaterialIcons
