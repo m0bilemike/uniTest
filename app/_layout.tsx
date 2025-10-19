@@ -1,4 +1,6 @@
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { AppDispatch, persistor, store } from "@/store";
+import { registerAppOpen } from "@/store/appUsageSlice";
 import {
   DarkTheme,
   DefaultTheme,
@@ -6,24 +8,46 @@ import {
 } from "@react-navigation/native";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import "react-native-reanimated";
+import { useEffect } from "react";
+import { ActivityIndicator } from "react-native";
+import { Provider, useDispatch } from "react-redux";
+import { PersistGate } from "redux-persist/integration/react";
 
-export const unstable_settings = {
-  anchor: "(tabs)",
+export const AppInitializer: React.FC = () => {
+  const dispatch = useDispatch<AppDispatch>();
+
+  useEffect(() => {
+    dispatch(registerAppOpen());
+  }, [dispatch]);
+
+  return null;
 };
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
+
   return (
-    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen
-          name="modal"
-          options={{ presentation: "modal", title: "Modal" }}
-        />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <Provider store={store}>
+      <PersistGate
+        loading={<ActivityIndicator size="large" />}
+        persistor={persistor}
+      >
+        <ThemeProvider
+          value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+        >
+          <AppInitializer />
+
+          <Stack>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen
+              name="settings"
+              options={{ presentation: "modal", title: "Settings" }}
+            />
+          </Stack>
+
+          <StatusBar style="auto" />
+        </ThemeProvider>
+      </PersistGate>
+    </Provider>
   );
 }
