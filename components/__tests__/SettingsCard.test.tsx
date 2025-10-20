@@ -1,13 +1,13 @@
 import { fireEvent, render } from "@testing-library/react-native";
 import React from "react";
 
+import SettingsCard from "../SettingsCard";
+
 jest.mock("../Themed", () => ({
   __esModule: true,
   Text: require("react-native").Text,
   useThemeColor: jest.fn(() => "white"),
 }));
-
-import SettingsCard from "../SettingsCard";
 
 test("renders label correctly", () => {
   const { getByText } = render(<SettingsCard label="Test Label" />);
