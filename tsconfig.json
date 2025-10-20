@@ -7,10 +7,15 @@
     }
   },
   "include": [
-    "**/*.ts",
-    "**/*.tsx",
+    "components",
+    "app",
     ".expo/types/**/*.ts",
-    "expo-env.d.ts",
+    "expo-env.d.ts"
+  ],
+  "exclude": [
+    "**/__tests__/**",
+    "**/*.test.ts",
+    "**/*.test.tsx",
     "jest.setup.js"
   ]
 }
