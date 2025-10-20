@@ -3,7 +3,6 @@ import { fireEvent, render } from "@testing-library/react-native";
 import React from "react";
 import { HeaderTitle } from "../HeaderTitle";
 
-// Mock only the things you need from Themed
 jest.mock("../Themed", () => {
   const React = require("react");
   return {
@@ -13,7 +12,6 @@ jest.mock("../Themed", () => {
   };
 });
 
-// Mock MaterialIcons safely
 jest.mock("@expo/vector-icons", () => {
   const React = require("react");
   return {
@@ -25,7 +23,7 @@ jest.mock("@expo/vector-icons", () => {
 describe("HeaderTitle", () => {
   it("renders title correctly", () => {
     const { getByText } = render(
-      <HeaderTitle title="My Header" isGrid={true} toggleLayout={() => {}} />
+      <HeaderTitle title="My Header" isGrid={true} toggleLayout={() => {}} />,
     );
     expect(getByText("My Header")).toBeTruthy();
   });
@@ -33,7 +31,7 @@ describe("HeaderTitle", () => {
   it("calls toggleLayout when icon is pressed", () => {
     const toggleMock = jest.fn();
     const { getByText } = render(
-      <HeaderTitle title="Header" isGrid={false} toggleLayout={toggleMock} />
+      <HeaderTitle title="Header" isGrid={false} toggleLayout={toggleMock} />,
     );
 
     fireEvent.press(getByText("grid-view"));
@@ -42,12 +40,12 @@ describe("HeaderTitle", () => {
 
   it("renders correct icon based on isGrid prop", () => {
     const { getByText, rerender } = render(
-      <HeaderTitle title="Header" isGrid={true} toggleLayout={() => {}} />
+      <HeaderTitle title="Header" isGrid={true} toggleLayout={() => {}} />,
     );
     expect(getByText("view-list")).toBeTruthy();
 
     rerender(
-      <HeaderTitle title="Header" isGrid={false} toggleLayout={() => {}} />
+      <HeaderTitle title="Header" isGrid={false} toggleLayout={() => {}} />,
     );
     expect(getByText("grid-view")).toBeTruthy();
   });

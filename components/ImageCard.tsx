@@ -48,7 +48,11 @@ export const ImageCard: React.FC<ImageCardProps> = ({
       />
       {isLoading && (
         <View style={styles.loaderContainer}>
-          <ActivityIndicator size="small" color={color} testID="ActivityIndicator"/>
+          <ActivityIndicator
+            size="small"
+            color={color}
+            testID="ActivityIndicator"
+          />
         </View>
       )}
       <TouchableOpacity

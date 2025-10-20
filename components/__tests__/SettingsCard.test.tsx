@@ -1,26 +1,25 @@
-import { fireEvent, render } from '@testing-library/react-native';
-import React from 'react';
+import { fireEvent, render } from "@testing-library/react-native";
+import React from "react";
 
-// Mock useThemeColor locally
-jest.mock('../Themed', () => ({
+jest.mock("../Themed", () => ({
   __esModule: true,
-  Text: require('react-native').Text,
-  useThemeColor: jest.fn(() => 'white'),
+  Text: require("react-native").Text,
+  useThemeColor: jest.fn(() => "white"),
 }));
 
-import SettingsCard from '../SettingsCard';
+import SettingsCard from "../SettingsCard";
 
-test('renders label correctly', () => {
+test("renders label correctly", () => {
   const { getByText } = render(<SettingsCard label="Test Label" />);
-  expect(getByText('Test Label')).toBeTruthy();
+  expect(getByText("Test Label")).toBeTruthy();
 });
 
-test('renders value correctly', () => {
+test("renders value correctly", () => {
   const { getByText } = render(<SettingsCard label="Label" value="42" />);
-  expect(getByText('42')).toBeTruthy();
+  expect(getByText("42")).toBeTruthy();
 });
 
-test('renders switch and handles change', () => {
+test("renders switch and handles change", () => {
   const onSwitchChange = jest.fn();
   const { getByTestId } = render(
     <SettingsCard
@@ -28,7 +27,7 @@ test('renders switch and handles change', () => {
       showSwitch
       switchValue={true}
       onSwitchChange={onSwitchChange}
-    />
+    />,
   );
-  fireEvent(getByTestId('switch'), 'valueChange', false);  // Normally you would assert the mock called, but you need to add testID to Switch in component
+  fireEvent(getByTestId("switch"), "valueChange", false);
 });

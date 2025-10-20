@@ -3,12 +3,10 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { Text, View, useThemeColor } from "../Themed";
 
-// Mock redux selector
 jest.mock("react-redux", () => ({
   useSelector: jest.fn(),
 }));
 
-// Mock theme colors
 jest.mock("@/constants/theme", () => ({
   Colors: {
     light: { text: "#000000", background: "#FFFFFF" },
@@ -19,9 +17,8 @@ jest.mock("@/constants/theme", () => ({
 describe("Themed components", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    // default to light theme
     (useSelector as jest.Mock).mockImplementation((fn) =>
-      fn({ theme: { current: "light" } })
+      fn({ theme: { current: "light" } }),
     );
   });
 
@@ -34,7 +31,7 @@ describe("Themed components", () => {
       : [text.props.style];
 
     expect(styleArray).toEqual(
-      expect.arrayContaining([expect.objectContaining({ color: "#000000" })])
+      expect.arrayContaining([expect.objectContaining({ color: "#000000" })]),
     );
   });
 
@@ -49,7 +46,7 @@ describe("Themed components", () => {
     expect(styleArray).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ backgroundColor: "#FFFFFF" }),
-      ])
+      ]),
     );
   });
 
@@ -65,7 +62,7 @@ describe("Themed components", () => {
 
   it("useThemeColor returns dark theme colors correctly", () => {
     (useSelector as jest.Mock).mockImplementation((fn) =>
-      fn({ theme: { current: "dark" } })
+      fn({ theme: { current: "dark" } }),
     );
 
     const textColor = useThemeColor({}, "text");

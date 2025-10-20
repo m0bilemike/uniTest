@@ -19,6 +19,7 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
    ```
 
 ## Available scripts
+
 ```bash
 yarn test
 
@@ -37,4 +38,3 @@ Browse images
 Like an image (tap on heart or double tap image)
 
 Theme selection
-

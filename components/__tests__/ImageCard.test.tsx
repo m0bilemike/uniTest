@@ -22,7 +22,7 @@ describe("ImageCard", () => {
 
   beforeEach(() => {
     store = mockStore({
-      theme: { current: "light" }, // match your Redux state shape
+      theme: { current: "light" },
     });
 
     onToggleLike = jest.fn();
@@ -33,7 +33,12 @@ describe("ImageCard", () => {
 
   it("renders author text", () => {
     const { getByText } = renderWithProvider(
-      <ImageCard item={item} liked={false} isGrid={false} onToggleLike={onToggleLike} />
+      <ImageCard
+        item={item}
+        liked={false}
+        isGrid={false}
+        onToggleLike={onToggleLike}
+      />,
     );
 
     expect(getByText("John Doe")).toBeTruthy();
@@ -41,10 +46,15 @@ describe("ImageCard", () => {
 
   it("calls onToggleLike when heart is pressed", () => {
     const { getByRole } = renderWithProvider(
-      <ImageCard item={item} liked={false} isGrid={false} onToggleLike={onToggleLike} />
+      <ImageCard
+        item={item}
+        liked={false}
+        isGrid={false}
+        onToggleLike={onToggleLike}
+      />,
     );
 
-    const button = getByRole("button"); // ensure your heart button has accessibilityRole="button"
+    const button = getByRole("button");
     fireEvent.press(button);
 
     expect(onToggleLike).toHaveBeenCalled();
@@ -52,10 +62,15 @@ describe("ImageCard", () => {
 
   it("renders loader initially", () => {
     const { getByTestId } = renderWithProvider(
-      <ImageCard item={item} liked={false} isGrid={false} onToggleLike={onToggleLike} />
+      <ImageCard
+        item={item}
+        liked={false}
+        isGrid={false}
+        onToggleLike={onToggleLike}
+      />,
     );
 
-    const loader = getByTestId("ActivityIndicator"); // ensure your loader has testID="ActivityIndicator"
+    const loader = getByTestId("ActivityIndicator");
     expect(loader).toBeTruthy();
   });
 });

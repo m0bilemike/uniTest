@@ -14,7 +14,7 @@ describe("DoubleTapImage", () => {
 
   beforeEach(() => {
     store = mockStore({
-      theme: { current: "light" }, // mock your Redux state
+      theme: { current: "light" },
     });
 
     onLoad = jest.fn();
@@ -32,7 +32,7 @@ describe("DoubleTapImage", () => {
         onDoubleTap={onDoubleTap}
         onLoad={onLoad}
         isGrid={false}
-      />
+      />,
     );
 
     const image = getByTestId("double-tap-image");
@@ -49,7 +49,7 @@ describe("DoubleTapImage", () => {
         onDoubleTap={onDoubleTap}
         onLoad={onLoad}
         isGrid={false}
-      />
+      />,
     );
 
     const touchable = getByTestId("double-tap-touchable");
@@ -67,7 +67,7 @@ describe("DoubleTapImage", () => {
         liked={false}
         author="John Doe"
         onDoubleTap={onDoubleTap}
-      />
+      />,
     );
 
     expect(getByText("John Doe")).toBeTruthy();
